@@ -105,6 +105,7 @@ var (
 	AuthProxyHeaderProperty string
 	AuthProxyAutoSignUp     bool
   AuthProxyPublicKey	    string
+  TimestampOffset         int64
 
 	// Basic Auth
 	BasicAuthEnabled bool
@@ -465,6 +466,8 @@ func NewConfigContext(args *CommandLineArgs) error {
 	AuthProxyHeaderProperty = authProxy.Key("header_property").String()
 	AuthProxyAutoSignUp     = authProxy.Key("auto_sign_up").MustBool(true)
   AuthProxyPublicKey      = authProxy.Key("public_key").String()
+  TimestampOffset         = authProxy.Key("timestamp_offset").MustInt64()
+
 
 	authBasic := Cfg.Section("auth.basic")
 	BasicAuthEnabled = authBasic.Key("enabled").MustBool(true)

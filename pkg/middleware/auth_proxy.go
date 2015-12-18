@@ -162,7 +162,12 @@ func lookupCallback(token map[string]interface{}) (interface{}, error) {
 }
 
 func getTime() time.Time {
-  var returnTime time.Time = time.Now().Add(   time.Duration(24)*time.Hour*-1 )
+
+  if ( setting.TimestampOffset == 0 ) {
+    return time.Now()
+  }
+
+  var returnTime time.Time = time.Now().Add( time.Duration( setting.TimestampOffset )*time.Hour*-1 )
 
   log.Debug("auth_proxy.go ::: returning new date = %v", returnTime)
 
