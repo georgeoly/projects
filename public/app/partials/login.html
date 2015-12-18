@@ -13,7 +13,7 @@
 				</button>
 			</div>
 
-			<div class="login-oauth text-center">
+			<div class="login-oauth text-center" ng-if="googleAuthEnabled || githubAuthEnabled || lottosAuthEnabled">
 				<a class="btn btn-google" href="login/google" target="_self" ng-if="googleAuthEnabled">
 					<i class="fa fa-google"></i>
 					with Google
