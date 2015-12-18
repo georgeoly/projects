@@ -31,12 +31,6 @@
 @purple:                #9954BB;
 @variable:              #2AB2E4;
 
-// Status colors
-// -------------------------
-@online:                #10a345;
-@warn:                  #ffc03c;
-@critical:              #ed2e18;
-
 // grafana Variables
 // -------------------------
 @grafanaPanelBackground: 	@grayLighter;
@@ -61,16 +55,15 @@
 @grafanaTargetFuncHightlight: darken(@grafanaTargetBackground, 10%);
 
 @modalBackground: @bodyBackground;
-@codeTagBackground: #ddd;
 
 // Scaffolding
 // -------------------------
-@bodyBackground:        #EFEFEF;
+@bodyBackground:        rgb(43,52,61);
 @textColor:             @gray;
 
 // Links
 // -------------------------
-@linkColor:             @gray;
+@linkColor:             @grayLighter;
 @linkColorDisabled:     lighten(@linkColor,30%);
 @linkColorHover:        darken(@linkColor, 20%);
 
@@ -238,11 +231,12 @@
 @navbarBackgroundHighlight:       #f8f8f8;
 @navbarBackground:                #f8f8f8;
 @navbarBorder:                    none;
+@topNavBarBackground:             lighten(@orange, 10%);
 
-@navbarText:                      #666;
-@navbarLinkColor:                 #666;
-@navbarLinkColorHover:            #333;
-@navbarLinkColorActive:           #555;
+@navbarText:                      #ABB;
+@navbarLinkColor:                 #CCC;
+@navbarLinkColorHover:            #AAA;
+@navbarLinkColorActive:           #EEE;
 @navbarLinkBackgroundHover:       transparent;
 @navbarLinkBackgroundActive:      darken(@navbarBackground, 6.5%);
 @navbarDropdownShadow:            inset 0px 4px 10px -4px darken(@bodyBackground, 20%);

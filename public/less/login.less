@@ -19,11 +19,11 @@
 
 
 .login-inner-box {
-  background: @grafanaPanelBackground;
+  background: lighten(@bodyBackground, 5%);
 }
 
 .login-tab-header {
-  background: @grafanaTargetBackground;
+  background: darken(@bodyBackground, 5%);
   text-align: center;
 }
 
@@ -82,7 +82,7 @@
 .login-oauth {
   margin-top: 30px;
   padding: 10px;
-  background: @grafanaTargetBackground;
+  background: lighten(@bodyBackground, 5%);;
   .btn-google {
     background: #dd4b39;
     color: white;

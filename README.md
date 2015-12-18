@@ -1,21 +1,5 @@
-[Grafana](http://grafana.org) [![Circle CI](https://circleci.com/gh/grafana/grafana.svg?style=svg)](https://circleci.com/gh/grafana/grafana) [![Coverage Status](https://coveralls.io/repos/grafana/grafana/badge.png)](https://coveralls.io/r/grafana/grafana) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/grafana/grafana?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-================
-[Website](http://grafana.org) |
-[Twitter](https://twitter.com/grafana) |
-[IRC](https://webchat.freenode.net/?channels=grafana) |
-[Email](mailto:contact@grafana.org)
 
-Grafana is an open source, feature rich metrics dashboard and graph editor for
-Graphite, Elasticsearch, OpenTSDB, Prometheus and InfluxDB.
 
-![](http://grafana.org/assets/img/start_page_bg.png)
-
-- [Install instructions](http://docs.grafana.org/installation/)
-- [What's New in Grafana 2.0](http://docs.grafana.org/guides/whats-new-in-v2/)
-- [What's New in Grafana 2.1](http://docs.grafana.org/guides/whats-new-in-v2-1/)
-- [What's New in Grafana 2.5](http://docs.grafana.org/guides/whats-new-in-v2-5/)
-
-## Features
 ### Graphite Target Editor
 - Graphite target expression parser
 - Feature rich query composer

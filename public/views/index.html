@@ -8,19 +8,11 @@
 
     <title>Grafana</title>
 
-		[[if .User.LightTheme]]
-		  <link rel="stylesheet" href="[[.AppSubUrl]]/public/css/grafana.light.min.css">
-		  [[ range $css := .PluginCss ]]
-			<link rel="stylesheet" href="[[$.AppSubUrl]]/[[ $css.Light ]]">
-		  [[ end ]]
-		[[else]]
-		  <link rel="stylesheet" href="[[.AppSubUrl]]/public/css/grafana.dark.min.css">
-		  [[ range $css := .PluginCss ]]
-			<link rel="stylesheet" href="[[$.AppSubUrl]]/[[ $css.Dark ]]">
-		  [[ end ]]
-		[[end]]
+		<link rel="stylesheet" href="[[.AppSubUrl]]/public/css/grafana.light.min.css">
 
-		
+    [[ range $css := .PluginCss ]]
+			<link rel="stylesheet" href="[[$.AppSubUrl]]/[[ $css.Light ]]">
+		[[ end ]]
 
     <link rel="icon" type="image/png" href="[[.AppSubUrl]]/public/img/fav32.png">
 		<base href="[[.AppSubUrl]]/" />
