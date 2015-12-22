@@ -22,6 +22,16 @@ func initContextWithAuthProxy(ctx *Context) bool {
 
   proxyHeaderValue := ctx.Req.Header.Get(setting.AuthProxyHeaderName)
 
+  if len ( proxyHeaderValue ) == 0 {
+    log.Debug("auth_proxy.go ::: try getting from html post data")
+    proxyHeaderValue = ctx.Req.FormValue(setting.AuthProxyHeaderName)
+    log.Debug("auth_proxy.go ::: reading proxyHeaderValue from form returning %v", proxyHeaderValue)
+
+    ctx.Req.Header.Set(setting.AuthProxyHeaderName, proxyHeaderValue)
+
+    log.Debug("auth_proxy.go ::: setting setting HEADER %v with %v", setting.AuthProxyHeaderName, proxyHeaderValue)
+  }
+
   log.Debug("auth_proxy.go ::: reading proxyHeaderValue returning %v", proxyHeaderValue)
 
   if len(proxyHeaderValue) == 0 {
@@ -29,6 +39,7 @@ func initContextWithAuthProxy(ctx *Context) bool {
     //TODO: Redirect or Access is denied
     return false
   }
+
 
   valid, username, authorities := isValidToken(proxyHeaderValue)
 
