@@ -36,14 +36,12 @@
 
 		<table class="grafana-options-table form-inline">
 			<tr>
-				<th>Username</th>
-				<th>Email</th>
+				<th>Rolename</th>
 				<th>Role</th>
 				<th></th>
 			</tr>
 			<tr ng-repeat="orgUser in orgUsers">
 				<td>{{orgUser.login}}</td>
-				<td>{{orgUser.email}}</td>
 				<td>
 					<select type="text" ng-model="orgUser.role" class="input-small" ng-options="f for f in ['Viewer', 'Editor', 'Read Only Editor', 'Admin']" ng-change="updateOrgUser(orgUser)">
 					</select>
