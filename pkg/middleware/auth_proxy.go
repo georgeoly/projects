@@ -9,6 +9,9 @@ import (
   "errors"
   "time"
   "fmt"
+  "encoding/xml"
+  "net/http"
+  "io/ioutil"
 )
 
 func initContextWithAuthProxy(ctx *Context) bool {
@@ -36,12 +39,24 @@ func initContextWithAuthProxy(ctx *Context) bool {
 
   if len(proxyHeaderValue) == 0 {
     log.Info("auth_proxy.go ::: proxyHeaderValue returned null")
+
+    http.Redirect(ctx.Resp, ctx.Req.Request, setting.AuthProxyLoginUrl, http.StatusFound)
+
+    return false
+  }
+
+  retrievedKey, publickey := getKeyFromURL()
+
+  if !retrievedKey {
+    log.Info("auth_proxy.go ::: NO RETRIEVED KEY")
     //TODO: Redirect or Access is denied
     return false
   }
 
+  log.Debug("auth_proxy.go ::: Retrieved Key %v", publickey)
 
-  valid, username, authorities := isValidToken(proxyHeaderValue)
+
+  valid, username, authorities := isValidToken(proxyHeaderValue, publickey)
 
   if ( !valid ) {
     log.Debug("auth_proxy.go ::: isValidToken returning %v", valid)
@@ -104,6 +119,54 @@ func initContextWithAuthProxy(ctx *Context) bool {
   return true
 }
 
+func getKeyFromURL() (bool, string) {
+
+  resp, err := http.Get( setting.AuthProxyPublicKey )
+
+  if err != nil {
+    // handle error
+    log.Debug("auth_proxy.go ::: getKeyFromURL() error retrieving key from get %v", err)
+    return false, ""
+  }
+
+  defer resp.Body.Close()
+
+  body, err := ioutil.ReadAll(resp.Body)
+
+  if err != nil {
+    // handle error
+    log.Debug("auth_proxy.go ::: getKeyFromURL() error retrieving key, error reading body %v", err)
+    return false, ""
+  }
+
+//  body := "<Map><alg>SHA256withRSA</alg><value>-----BEGIN PUBLIC KEY-----\n" +
+//  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnGp/Q5lh0P8nPL21oMMrt2RrkT9AW5jgYwLfSUnJVc9G6uR3cXRRDCjHqWU5WYwivcF180A6CWp/ireQFFBNowgc5XaA0kPpzEtgsA5YsNX7iSnUibB004iBTfU9hZ2Rbsc8cWqynT0RyN4TP1RYVSeVKvMQk4GT1r7JCEC+TNu1ELmbNwMQyzKjsfBXyIOCFU/E94ktvsTZUHF4Oq44DBylCDsS1k7/sfZC2G5EU7Oz0mhG8+Uz6MSEQHtoIi6mc8u64Rwi3Z3tscuWG2ShtsUFuNSAFNkY7LkLn+/hxLCu2bNISMaESa8dG22CIMuIeRLVcAmEWEWH5EEforTg+QIDAQAB\n" +
+//  "-----END PUBLIC KEY-----</value></Map>"
+
+  type Map struct {
+    Key []string `xml:"value"`
+  }
+
+  v := Map{Key: []string{}}
+
+  err = xml.Unmarshal([]byte(body), &v)
+
+  if err != nil {
+    log.Debug("auth_proxy.go ::: error while unmarshalling %v", err)
+    return false, ""
+  }
+
+  log.Debug("auth_proxy.go ::: Unmarshalled xml %q", v)
+
+  if len( v.Key ) == 0 {
+    log.Debug("auth_proxy.go ::: NO keys found")
+    return false, ""
+
+  }
+
+  return true, v.Key[0]
+}
+
 func getUserFromAuthorities( authorities interface{} ) (bool, *m.GetSignedInUserQuery) {
 
   log.Debug("auth_proxy.go ::: entered function getUserFromAuthorities with authorities=%v", authorities)
@@ -159,7 +222,7 @@ func getSignedInUserQueryForProxyAuth( userId  int64) *m.GetSignedInUserQuery {
   return &query
 }
 
-func lookupCallback(token map[string]interface{}) (interface{}, error) {
+func lookupCallback(token map[string]interface{}, publickey string) (interface{}, error) {
 
   log.Debug("auth_proxy.go ::: entered myLookupKey for token %v", token)
 
@@ -167,9 +230,7 @@ func lookupCallback(token map[string]interface{}) (interface{}, error) {
 
     token["client_id"],token["jti"],token["scope"],token["exp"],token["user_name"],token["authorities"], setting.AuthProxyPublicKey)
 
-  var public_key string = "-----BEGIN PUBLIC KEY-----\n" + setting.AuthProxyPublicKey + "\n-----END PUBLIC KEY-----"
-
-  return []byte( public_key ), nil
+  return []byte( publickey ), nil
 }
 
 func getTime() time.Time {
@@ -185,7 +246,7 @@ func getTime() time.Time {
   return returnTime
 }
 
-func isValidToken(inputToken string) (bool, string, interface{}) {
+func isValidToken(inputToken string, publickey string) (bool, string, interface{}) {
 
   if len(inputToken) == 0 {
     log.Debug("auth_proxy.go ::: nil input token found")
@@ -202,7 +263,7 @@ func isValidToken(inputToken string) (bool, string, interface{}) {
 
     log.Debug("auth_proxy.go ::: callback for token %v", token)
 
-    return lookupCallback(token.Claims)
+    return lookupCallback(token.Claims, publickey)
   })
 
   if token == nil {

@@ -105,6 +105,7 @@ var (
 	AuthProxyHeaderProperty string
 	AuthProxyAutoSignUp     bool
   AuthProxyPublicKey	    string
+  AuthProxyLoginUrl       string
   TimestampOffset         int64
 
 	// Basic Auth
@@ -466,6 +467,7 @@ func NewConfigContext(args *CommandLineArgs) error {
 	AuthProxyHeaderProperty = authProxy.Key("header_property").String()
 	AuthProxyAutoSignUp     = authProxy.Key("auto_sign_up").MustBool(true)
   AuthProxyPublicKey      = authProxy.Key("public_key").String()
+  AuthProxyLoginUrl       = authProxy.Key("login_url").String()
   TimestampOffset         = authProxy.Key("timestamp_offset").MustInt64()
 
 
