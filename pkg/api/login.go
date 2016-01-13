@@ -1,7 +1,6 @@
 package api
 
 import (
-	"net/url"
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/log"
 	"github.com/grafana/grafana/pkg/middleware"
@@ -22,30 +21,7 @@ const (
 )
 
 func LoginView(c *middleware.Context) {
-	viewData, err := setIndexViewData(c)
-	if err != nil {
-		c.Handle(500, "Failed to get settings", err)
-		return
-	}
-
-	viewData.Settings["googleAuthEnabled"] = setting.OAuthService.Google
-	viewData.Settings["githubAuthEnabled"] = setting.OAuthService.GitHub
-  viewData.Settings["lottosAuthEnabled"] = setting.OAuthService.Lottos
-	viewData.Settings["disableUserSignUp"] = true  //!setting.AllowUserSignUp
-	viewData.Settings["loginHint"]         = false //setting.LoginHint
-
-	if !tryLoginUsingRememberCookie(c) {
-		c.HTML(200, VIEW_INDEX, viewData)
-		return
-	}
-
-	if redirectTo, _ := url.QueryUnescape(c.GetCookie("redirect_to")); len(redirectTo) > 0 {
-		c.SetCookie("redirect_to", "", -1, setting.AppSubUrl+"/")
-		c.Redirect(redirectTo)
-		return
-	}
-
-	c.Redirect(setting.AppSubUrl + "/")
+  c.Redirect(setting.AuthProxyLoginUrl)
 }
 
 func tryLoginUsingRememberCookie(c *middleware.Context) bool {
