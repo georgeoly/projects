@@ -11,10 +11,10 @@ import (
   "net/http"
   "errors"
   "io/ioutil"
-  "encoding/xml"
   "time"
 "github.com/dgrijalva/jwt-go"
   "fmt"
+  "encoding/json"
 )
 
 const (
@@ -102,7 +102,7 @@ func LoginPost(c *middleware.Context) {
     return
   }
 
-  c.Handle(500, "Failed to get settings", errors.New("Error"))
+  c.Redirect(setting.AuthProxyLoginUrl)
 }
 
 func loginUserWithUser(user *m.User, c *middleware.Context) {
@@ -151,8 +151,6 @@ func initContextWithAuthProxy(ctx *middleware.Context) bool {
 
   if len(proxyHeaderValue) == 0 {
     log.Info("login.go ::: proxyHeaderValue returned null")
-
-    http.Redirect(ctx.Resp, ctx.Req.Request, setting.AuthProxyLoginUrl, http.StatusFound)
 
     return false
   }
@@ -232,8 +230,6 @@ func initContextWithAuthProxy(ctx *middleware.Context) bool {
 
   days := 86400 * setting.LogInRememberDays
   ctx.SetCookie(setting.CookieUserName, user.Login, days, setting.AppSubUrl+"/")
-  //c.SetSuperSecureCookie(util.EncodeMd5(user.Rands+user.Password), setting.CookieRememberName, user.Login, days, setting.AppSubUrl+"/")
-
   ctx.Session.Set(middleware.SESS_KEY_USERID, user.UserId)
 
   return true
@@ -263,28 +259,29 @@ func getKeyFromURL() (bool, string) {
   //  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnGp/Q5lh0P8nPL21oMMrt2RrkT9AW5jgYwLfSUnJVc9G6uR3cXRRDCjHqWU5WYwivcF180A6CWp/ireQFFBNowgc5XaA0kPpzEtgsA5YsNX7iSnUibB004iBTfU9hZ2Rbsc8cWqynT0RyN4TP1RYVSeVKvMQk4GT1r7JCEC+TNu1ELmbNwMQyzKjsfBXyIOCFU/E94ktvsTZUHF4Oq44DBylCDsS1k7/sfZC2G5EU7Oz0mhG8+Uz6MSEQHtoIi6mc8u64Rwi3Z3tscuWG2ShtsUFuNSAFNkY7LkLn+/hxLCu2bNISMaESa8dG22CIMuIeRLVcAmEWEWH5EEforTg+QIDAQAB\n" +
   //  "-----END PUBLIC KEY-----</value></Map>"
 
-  type Map struct {
-    Key []string `xml:"value"`
+  var dat map[string]interface{}
+
+  if err := json.Unmarshal([]byte(body), &dat); err != nil {
+    log.Debug("login.go ::: getKeyFromURL() error retrieving key, error Unmarshal body %v", err)
+    return false, ""
   }
 
-  v := Map{Key: []string{}}
-
-  err = xml.Unmarshal([]byte(body), &v)
+  key := dat["value"].(string)
 
   if err != nil {
     log.Debug("login.go ::: error while unmarshalling %v", err)
     return false, ""
   }
 
-  log.Debug("login.go ::: Unmarshalled xml %q", v)
+  log.Debug("login.go ::: Unmarshalled json %q", key)
 
-  if len( v.Key ) == 0 {
+  if len( key ) == 0 {
     log.Debug("login.go ::: NO keys found")
     return false, ""
 
   }
 
-  return true, v.Key[0]
+  return true, key
 }
 
 func getUserFromAuthorities( authorities interface{} ) (bool, *m.GetSignedInUserQuery) {
